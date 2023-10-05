@@ -5,6 +5,8 @@
 package com.mycompany.visao.categoria;
 
 import com.mycompany.dao.DaoCategoria;
+import com.mycompany.ferramentas.DadosTemporarios;
+import com.mycompany.modelo.ModCategoria;
 import java.sql.ResultSet;
 import javax.swing.table.DefaultTableModel;
 
@@ -93,6 +95,31 @@ public class ListCategoria extends javax.swing.JFrame {
             System.out.println(e.getMessage());
         }
     }
+    
+     public void listarPorDescricao(String pDescricao){
+        try{
+            //Define o model da tabela.
+            DefaultTableModel defaultTableModel = (DefaultTableModel) tableCategoria.getModel();
+
+            tableCategoria.setModel(defaultTableModel);
+
+            DaoCategoria daoCategoria = new DaoCategoria();
+
+            //Atribui o resultset retornado a uma variável para ser usada.
+            ResultSet resultSet = daoCategoria.listarPorDescricao(pDescricao);
+            
+            defaultTableModel.setRowCount(0);
+            while (resultSet.next()){
+                String id = resultSet.getString(1);
+                String nome = resultSet.getString(2);
+                String descricao = resultSet.getString(3);
+                
+                defaultTableModel.addRow(new Object[]{id, nome, descricao});
+            }
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -111,6 +138,12 @@ public class ListCategoria extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
+        jPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jPanel1MouseClicked(evt);
+            }
+        });
+
         tableCategoria.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -127,9 +160,19 @@ public class ListCategoria extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        tableCategoria.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableCategoriaMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tableCategoria);
 
         btnBuscar.setText("BUSCAR");
+        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarActionPerformed(evt);
+            }
+        });
 
         jcbTipoFiltro.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Todos", "ID", "Nome", "Descrição" }));
         jcbTipoFiltro.addActionListener(new java.awt.event.ActionListener() {
@@ -187,8 +230,44 @@ public class ListCategoria extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jcbTipoFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbTipoFiltroActionPerformed
-        
+         
     }//GEN-LAST:event_jcbTipoFiltroActionPerformed
+
+    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+         switch (jcbTipoFiltro.getSelectedIndex()){
+            case 0:
+                ListarTodos();
+                break;
+            case 1:
+                listarPorId(Integer.parseInt(tfFiltro.getText()));
+                break;
+            case 2:
+                listarPorNome(tfFiltro.getText());
+                break;
+            case 3:
+                listarPorDescricao(tfFiltro.getText());
+                break;
+        }        
+    }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void jPanel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jPanel1MouseClicked
+
+    private void tableCategoriaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableCategoriaMouseClicked
+        if (evt.getClickCount() == 2){
+            ModCategoria modCategoria = new ModCategoria();
+            
+            modCategoria.setId(Integer.parseInt(String.valueOf(tableCategoria.getValueAt(tableCategoria.getSelectedRow(), 0))));
+            modCategoria.setNome(String.valueOf(tableCategoria.getValueAt(tableCategoria.getSelectedRow(), 1)));
+            modCategoria.setDescricao(String.valueOf(tableCategoria.getValueAt(tableCategoria.getSelectedRow(), 2)));
+            
+            DadosTemporarios.tempObject = (ModCategoria) modCategoria;
+            
+            CadCategoria cadCategoria = new CadCategoria();
+            cadCategoria.setVisible(true);
+        }
+    }//GEN-LAST:event_tableCategoriaMouseClicked
 
     /**
      * @param args the command line arguments
