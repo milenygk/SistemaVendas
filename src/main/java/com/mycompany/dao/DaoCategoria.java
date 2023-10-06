@@ -40,7 +40,7 @@ public class DaoCategoria extends BancoDeDadosMySql{
         try{
             sql = "UPDATE CATEGORIA SET NOME = ?, DESCRICAO = ? WHERE ID = ?";
             
-            setStatement(getConexao().prepareStatement(sql));
+             
             
             getStatement().setInt(3, id);
             getStatement().setString(1, novoNome);
